@@ -35,5 +35,5 @@ module "wireguard_gateway" {
   ibm_security_group_id = module.ibm_vpc.vpc_default_security_group_id
   vpn_cidr              = var.vpn_cidr
   vpn_listen_port       = var.vpn_listen_port
-  vpn_internal_networks = var.vpn_internal_networks
+  vpn_internal_networks = "${module.ibm_vpc.vpc_zone_1_subnet_cidr}, ${module.ibm_vpc.vpc_zone_2_subnet_cidr}, ${module.ibm_vpc.vpc_zone_3_subnet_cidr}"
 }

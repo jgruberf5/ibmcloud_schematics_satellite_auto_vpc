@@ -114,11 +114,3 @@ variable "vpn_listen_port" {
   default     = 41194
   description = "VPN listen port"
 }
-
-##################################################################################
-#  vpn_internal_networks - The internal networks the VPN can route to
-##################################################################################
-variable "vpn_internal_networks" {
-  default     = "10.241.0.0/16"
-  description = "The internal networks the VPN can route to"
-}
