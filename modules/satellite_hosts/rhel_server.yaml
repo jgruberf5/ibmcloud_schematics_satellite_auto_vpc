@@ -6,6 +6,10 @@ runcmd:
   - [ subscription-manager, repos, --enable, rhel-7-server-rh-common-rpms ]
   - [ subscription-manager, repos, --enable, rhel-7-server-supplementary-rpms ]
   - [ subscription-manager, repos, --enable, rhel-7-server-extras-rpms ]
+  - [ subscription-manager release --set=7Server ]
+  - [ yum clean all ]
+  - [ subscription-manager refresh ]
+  - [ subscription-manager repos --enable=* ]
 
 power_state:
   mode: reboot
