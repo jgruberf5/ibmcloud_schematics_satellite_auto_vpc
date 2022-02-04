@@ -26,26 +26,26 @@ variable "ibm_vpc_index" {
 ##################################################################################
 # ibm_vpc_zone_1_prefix - The IPv4 VPC cidr to use as network prefix in zone 1
 ##################################################################################
-variable "ibm_vpc_zone_1_prefix" {
-  default     = ""
-  description = "The IPv4 VPC cidr to use as network prefix in zone 1"
-}
+#variable "ibm_vpc_zone_1_prefix" {
+#  default     = ""
+#  description = "The IPv4 VPC cidr to use as network prefix in zone 1"
+#}
 
 ##################################################################################
 # ibm_vpc_zone_2_prefix - The IPv4 VPC cidr to use as network prefix in zone 2
 ##################################################################################
-variable "ibm_vpc_zone_2_prefix" {
-  default     = ""
-  description = "The IPv4 VPC cidr to use as network prefix in zone 2"
-}
+#variable "ibm_vpc_zone_2_prefix" {
+#  default     = ""
+#  description = "The IPv4 VPC cidr to use as network prefix in zone 2"
+#}
 
 ##################################################################################
 # ibm_vpc_zone_3_prefix - The IPv4 VPC cidr to use as network prefix in zone 3
 ##################################################################################
-variable "ibm_vpc_zone_3_prefix" {
-  default     = ""
-  description = "The IPv4 VPC cidr to use as network prefix in zone 3"
-}
+#variable "ibm_vpc_zone_3_prefix" {
+#  default     = ""
+#  description = "The IPv4 VPC cidr to use as network prefix in zone 3"
+#}
 
 ##################################################################################
 # ibm_ssh_key_name - The name of the existing SSH key to inject into infrastructure
