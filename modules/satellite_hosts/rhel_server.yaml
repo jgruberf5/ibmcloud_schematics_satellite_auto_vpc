@@ -1,0 +1,12 @@
+#cloud-config
+runcmd:
+  - [ subscription-manager, refresh ]
+  - [ subscription-manager, repos, --enable, rhel-server-rhscl-7-rpms ]
+  - [ subscription-manager, repos, --enable, rhel-7-server-optional-rpms ]
+  - [ subscription-manager, repos, --enable, rhel-7-server-rh-common-rpms ]
+  - [ subscription-manager, repos, --enable, rhel-7-server-supplementary-rpms ]
+  - [ subscription-manager, repos, --enable, rhel-7-server-extras-rpms ]
+
+power_state:
+  mode: reboot
+  condition: True

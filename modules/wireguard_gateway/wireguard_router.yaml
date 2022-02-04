@@ -1,0 +1,129 @@
+#cloud-config
+package_upate: true
+packages:
+  - wireguard
+  - zip
+
+write_files:
+- path: /etc/sysctl.d/98-ip-forward.conf
+  content: |
+    net.ipv4.ip_forward = 1
+- owner: root:root
+  path: /root/generate_configuration.py
+  permissions: '0755'
+  content: |
+    #!/usr/bin/env python3
+
+    import os
+    import subprocess as sp
+    import ipaddress as ipa
+    import requests
+    import socket
+
+    VPN_CIDR = None
+    LISTEN_PORT = 41194
+    REMOTE_NETWORKS = None
+    SERVER_NIC = None
+    PEER_PREFIX = None
+
+
+    def generate_config():
+        os.makedirs('/etc/wireguard', exist_ok=True)
+        os.chdir('/etc/wireguard')
+        with open('/etc/wireguard/postup.sh', 'w') as pu:
+            pu.write("#!/usr/bin/bash\n\n")
+            pu.write("set -ex\n")
+            pu.write("iptables -A FORWARD -i %i -j ACCEPT\n")
+            pu.write("iptables -A FORWARD -o %i -j ACCEPT\n")
+            pu.write("iptables -t nat -A POSTROUTING -o %s -j MASQUERADE\n" % SERVER_NIC)
+        os.chmod('/etc/wireguard/postup.sh', 755)
+        with open('/etc/wireguard/postdown.sh', 'w') as pu:
+            pu.write("#!/usr/bin/bash\n\n")
+            pu.write("set -ex\n")
+            pu.write("iptables -D FORWARD -i %i -j ACCEPT\n")
+            pu.write("iptables -D FORWARD -o %i -j ACCEPT\n")
+            pu.write("iptables -t nat -D POSTROUTING -o %s -j MASQUERADE\n" % SERVER_NIC)
+        os.chmod('/etc/wireguard/postdown.sh', 755)
+        sp.call(
+            'wg genkey | tee server_privatekey | wg pubkey > server_publickey', shell=True)
+        server_private_key = ''
+        with open('/etc/wireguard/server_privatekey', 'r') as prkf:
+            server_private_key = prkf.read()
+        server_public_key = ''
+        with open('/etc/wireguard/server_publickey', 'r') as pubkf:
+            server_public_key = pubkf.read()
+        vpn_network = ipa.IPv4Network(VPN_CIDR)
+        server_address = None
+        client_addresses = []
+        for addr in vpn_network.hosts():
+            if not server_address:
+                server_address = "%s/%d" % (addr, vpn_network.prefixlen)
+            else:
+                client_addresses.append("%s/%d" % (addr, vpn_network.prefixlen))
+        with open('/etc/wireguard/wg0.conf', 'w') as wgconf:
+            wgconf.write("[Interface]\n")
+            wgconf.write("Address = %s\n" % server_address)
+            wgconf.write("SaveConfig = false\n")
+            wgconf.write("PostUp = /etc/wireguard/postup.sh\n")
+            wgconf.write("PostDown = /etc/wireguard/postdown.sh\n")
+            wgconf.write("ListenPort = %d\n" % LISTEN_PORT)
+            wgconf.write("PrivateKey = %s\n" % server_private_key.strip())
+            wgconf.write("\n")
+            for x, ca in enumerate(client_addresses):
+                sp.call(
+                    "wg genkey | tee peer_privatekey | wg pubkey > peer_publickey", shell=True)
+                peer_private_key = ''
+                with open('/etc/wireguard/peer_privatekey', 'r') as prkf:
+                    peer_private_key = prkf.read()
+                peer_public_key = ''
+                with open('/etc/wireguard/peer_publickey', 'r') as pubkf:
+                    peer_public_key = pubkf.read()
+                wgconf.write("[Peer]\n")
+                gateway_external_address = requests.get(
+                    'https://ident.me').content.decode('utf8')
+                with open("/etc/wireguard/%s-%d.conf" % (PEER_PREFIX, (x + 1)), 'w') as pconfig:
+                    pconfig.write("[Interface]\n")
+                    pconfig.write("PrivateKey = %s\n" % peer_private_key.strip())
+                    pconfig.write("Address = %s\n" % ca)
+                    pconfig.write("\n\n")
+                    pconfig.write("[Peer]\n")
+                    pconfig.write("PublicKey = %s\n" %
+                                  server_public_key.strip())
+                    pconfig.write("AllowedIPs = %s, %s\n" %
+                                  (str(ca).strip(), REMOTE_NETWORKS))
+                    pconfig.write("Endpoint = %s:%d\n" %
+                                  (gateway_external_address.strip(), LISTEN_PORT))
+                    wgconf.write("AllowedIPs = %s/32\n" %
+                                 str(ca).strip().split('/')[0])
+                wgconf.write("PublicKey = %s\n" % peer_public_key.strip())
+                wgconf.write("\n")
+                os.unlink('/etc/wireguard/peer_privatekey')
+                os.unlink('/etc/wireguard/peer_publickey')
+            sp.call("find . -name \"%s*.conf\" -print | xargs zip %s-wireguard-configs" % (PEER_PREFIX, PEER_PREFIX), shell=True)
+        sp.call('systemctl enable wg-quick@wg0', shell=True)
+        sp.call('systemctl start wg-quick@wg0', shell=True)
+
+
+    def intialize():
+        global VPN_CIDR, LISTEN_PORT, REMOTE_NETWORKS, SERVER_NIC, PEER_PREFIX
+        SERVER_NIC = socket.if_nameindex()[1][1]
+        VPN_CIDR = os.getenv('VPN_CIDR', '${vpn_cidr}')
+        LISTEN_PORT = int(os.getenv('LISTEN_PORT', '${vpn_listen_port}'))
+        REMOTE_NETWORKS = os.getenv('REMOTE_NETWORKS', '${vpn_internal_networks}')
+        ip_addr = sp.getoutput("ip addr | grep inet | grep %s" % SERVER_NIC).strip().split(' ')[1]
+        ip_net = str(ipa.IPv4Interface(ip_addr).network)
+        rn_list = REMOTE_NETWORKS.split(',')
+        if not ip_net in rn_list:
+            rn_list.append(ip_net)
+        REMOTE_NETWORKS = ', '.join(rn_list)
+        PEER_PREFIX = os.getenv('PEER_PREFIX', '${vpn_peer_prefix}')[0:10]
+
+
+    if __name__ == "__main__":
+        intialize()
+        generate_config()
+
+runcmd:
+  - [ /root/generate_configuration.py ]
+  - [ apt -y upgrade ]
+  - [ reboot ]
