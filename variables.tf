@@ -48,6 +48,14 @@ variable "ibm_vpc_index" {
 #}
 
 ##################################################################################
+# ibm_satellite_location_managed_from - The IKS metro to manage this location
+##################################################################################
+variable "ibm_satellite_location_managed_from" {
+  default     = "dal10"
+  description = "The IKS metro to manage this location (ibmcloud ks locations)"
+}
+
+##################################################################################
 # ibm_ssh_key_name - The name of the existing SSH key to inject into infrastructure
 ##################################################################################
 variable "ibm_ssh_key_name" {

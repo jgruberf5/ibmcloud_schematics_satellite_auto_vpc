@@ -81,3 +81,11 @@ variable "ibm_security_group_id" {
   default     = ""
   description = "The VPC security group ID"
 }
+
+##################################################################################
+# ibm_attach_script - The managed server attach script content
+##################################################################################
+variable "ibm_attach_script" {
+  default     = ""
+  description = "The managed server attach script content"
+}

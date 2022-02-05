@@ -20,13 +20,17 @@ data "ibm_is_vpc" "vpn_vpc" {
   name = data.ibm_is_subnet.subnet.vpc_name
 }
 
+locals {
+  peer_prefix = replace(replace(var.ibm_resource_prefix, "-", ""), "_", "")
+}
+
 data "template_file" "wr" {
   template = file("${path.module}/wireguard_router.yaml")
   vars = {
     vpn_cidr              = var.vpn_cidr
     vpn_listen_port       = var.vpn_listen_port
     vpn_internal_networks = var.vpn_internal_networks
-    vpn_peer_prefix       = replace(replace(var.ibm_resource_prefix, "-", ""), "_", "")
+    vpn_peer_prefix       = local.peer_prefix
   }
 }
 
