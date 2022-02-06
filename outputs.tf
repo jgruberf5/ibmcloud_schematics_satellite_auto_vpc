@@ -37,3 +37,8 @@ output "vpn_address" {
   value       = module.wireguard_gateway.vpn_address
   description = "The VPN router public address"
 }
+
+output "vpn_client_configurations" {
+  value       = module.wireguard_gateway.client_configurations
+  description = "SSH copy location for the VPN gateway client configurations"
+}

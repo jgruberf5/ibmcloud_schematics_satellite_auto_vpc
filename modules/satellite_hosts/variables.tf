@@ -38,7 +38,7 @@ variable "ibm_control_profile" {
 ##################################################################################
 variable "ibm_compute_profile" {
   type        = string
-  default     = "bx2-8x32"
+  default     = "bx2-16x64"
   description = "The name of the VPC profile to use for the compute instances"
 }
 

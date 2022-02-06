@@ -74,7 +74,14 @@ resource "ibm_is_instance" "control_server_01_instance" {
 #  resource_group = data.ibm_resource_group.group.id
 #  target         = ibm_is_instance.control_server_01_instance.primary_network_interface[0].id
 #}
-resource "ibm_is_volume" "compute_data_vol_01" {
+resource "ibm_is_volume" "compute_data_vol_host_01_vol_01" {
+  name     = "${var.ibm_resource_prefix}-cmp-1"
+  profile  = "custom"
+  zone     = data.ibm_is_subnet.zone_1_subnet.zone
+  iops     = 3000
+  capacity = 200
+}
+resource "ibm_is_volume" "compute_data_vol_host_01_vol_02" {
   name     = "${var.ibm_resource_prefix}-cmp-1"
   profile  = "custom"
   zone     = data.ibm_is_subnet.zone_1_subnet.zone
@@ -95,7 +102,7 @@ resource "ibm_is_instance" "compute_server_01_instance" {
   zone               = data.ibm_is_subnet.zone_1_subnet.zone
   keys               = [data.ibm_is_ssh_key.ssh_key.id]
   auto_delete_volume = true
-  volumes            = [ibm_is_volume.compute_data_vol_01.id]
+  volumes            = [ibm_is_volume.compute_data_vol_host_01_vol_01.id, ibm_is_volume.compute_data_vol_host_01_vol_02.id]
   user_data          = data.template_file.rhel_server.rendered
   timeouts {
     create = "60m"
@@ -135,7 +142,14 @@ resource "ibm_is_instance" "control_server_02_instance" {
 #  resource_group = data.ibm_resource_group.group.id
 #  target         = ibm_is_instance.control_server_02_instance.primary_network_interface[0].id
 #}
-resource "ibm_is_volume" "compute_data_vol_02" {
+resource "ibm_is_volume" "compute_data_vol_host_02_vol_01" {
+  name     = "${var.ibm_resource_prefix}-cmp-2"
+  profile  = "custom"
+  zone     = data.ibm_is_subnet.zone_2_subnet.zone
+  iops     = 3000
+  capacity = 200
+}
+resource "ibm_is_volume" "compute_data_vol_host_02_vol_02" {
   name     = "${var.ibm_resource_prefix}-cmp-2"
   profile  = "custom"
   zone     = data.ibm_is_subnet.zone_2_subnet.zone
@@ -156,7 +170,7 @@ resource "ibm_is_instance" "compute_server_02_instance" {
   zone               = data.ibm_is_subnet.zone_2_subnet.zone
   keys               = [data.ibm_is_ssh_key.ssh_key.id]
   auto_delete_volume = true
-  volumes            = [ibm_is_volume.compute_data_vol_02.id]
+  volumes            = [ibm_is_volume.compute_data_vol_host_02_vol_01.id, ibm_is_volume.compute_data_vol_host_02_vol_02.id]
   user_data          = data.template_file.rhel_server.rendered
   timeouts {
     create = "60m"
@@ -196,7 +210,14 @@ resource "ibm_is_instance" "control_server_03_instance" {
 #  resource_group = data.ibm_resource_group.group.id
 #  target         = ibm_is_instance.control_server_03_instance.primary_network_interface[0].id
 #}
-resource "ibm_is_volume" "compute_data_vol_03" {
+resource "ibm_is_volume" "compute_data_vol_host_03_vol_01" {
+  name     = "${var.ibm_resource_prefix}-cmp-3"
+  profile  = "custom"
+  zone     = data.ibm_is_subnet.zone_3_subnet.zone
+  iops     = 3000
+  capacity = 200
+}
+resource "ibm_is_volume" "compute_data_vol_host_03_vol_02" {
   name     = "${var.ibm_resource_prefix}-cmp-3"
   profile  = "custom"
   zone     = data.ibm_is_subnet.zone_3_subnet.zone
@@ -217,7 +238,7 @@ resource "ibm_is_instance" "compute_server_03_instance" {
   zone               = data.ibm_is_subnet.zone_3_subnet.zone
   keys               = [data.ibm_is_ssh_key.ssh_key.id]
   auto_delete_volume = true
-  volumes            = [ibm_is_volume.compute_data_vol_03.id]
+  volumes            = [ibm_is_volume.compute_data_vol_host_03_vol_01.id, ibm_is_volume.compute_data_vol_host_03_vol_02.id]
   user_data          = data.template_file.rhel_server.rendered
   timeouts {
     create = "60m"
