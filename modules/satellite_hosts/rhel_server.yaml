@@ -1,23 +1,27 @@
 #cloud-config
 write_files:
 - owner: root:root
-  path: /etc/ibm_attach_script.sh
-  permissions: '0755'
+  path: /etc/ibm_attach_script.b64
+  permissions: '0644'
   content: |
     ${attach_script}
+- owner: root:root
+  path: /root/setup_host.sh
+  permission: '0755'
+  content: |
+    #!/bin/bash
+    subscription-manager refresh
+    subscription-manager release --set=7Server
+    yum clean all
+    subscription-manager repos --enable=*
+    cat /etc/ibm_attach_script.b64 | base64 --decode > /etc/ibm_attach_script
+    sleep 30
+    yum clean all
+    subscription-manager refresh
+    bash /etc/ibm_attach_script
 
 runcmd:
-#  - [ subscription-manager, refresh ]
-#  - [ subscription-manager, repos, --enable, rhel-server-rhscl-7-rpms ]
-#  - [ subscription-manager, repos, --enable, rhel-7-server-optional-rpms ]
-#  - [ subscription-manager, repos, --enable, rhel-7-server-rh-common-rpms ]
-#  - [ subscription-manager, repos, --enable, rhel-7-server-supplementary-rpms ]
-#  - [ subscription-manager, repos, --enable, rhel-7-server-extras-rpms ]
-  - [ subscription-manager release --set=7Server ]
-  - [ yum clean all ]
-  - [ subscription-manager refresh ]
-  - [ subscription-manager repos --enable=* ]
-  - [ nohup bash /etc/ibm_attach_script.sh ]
+  - nohup bash /root/setup_host.sh
 
 power_state:
   mode: reboot

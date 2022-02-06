@@ -33,7 +33,7 @@ data "ibm_is_vpc" "sat_vpc" {
 }
 
 locals {
-  attach_script_content = var.ibm_attach_script == "" ? "echo 'unmanaged host'\n" : var.ibm_attach_script
+  attach_script_content = base64encode(var.ibm_attach_script == "" ? "echo 'unmanaged host'\n" : var.ibm_attach_script)
 }
 
 
@@ -75,9 +75,11 @@ resource "ibm_is_instance" "control_server_01_instance" {
 #  target         = ibm_is_instance.control_server_01_instance.primary_network_interface[0].id
 #}
 resource "ibm_is_volume" "compute_data_vol_01" {
-  name    = "${var.ibm_resource_prefix}-cmp-1"
-  profile = "general-purpose"
-  zone    = data.ibm_is_subnet.zone_3_subnet.zone
+  name     = "${var.ibm_resource_prefix}-cmp-1"
+  profile  = "custom"
+  zone     = data.ibm_is_subnet.zone_1_subnet.zone
+  iops     = 3000
+  capacity = 200
 }
 resource "ibm_is_instance" "compute_server_01_instance" {
   name           = "${var.ibm_resource_prefix}-cmp-1"
@@ -99,6 +101,9 @@ resource "ibm_is_instance" "compute_server_01_instance" {
     create = "60m"
     delete = "120m"
   }
+  depends_on = [
+    ibm_is_instance.control_server_01_instance
+  ]
 }
 #resource "ibm_is_floating_ip" "compute_server_01_floating_ip" {
 #  name           = "${var.ibm_resource_prefix}-cmp-1-fip"
@@ -131,9 +136,11 @@ resource "ibm_is_instance" "control_server_02_instance" {
 #  target         = ibm_is_instance.control_server_02_instance.primary_network_interface[0].id
 #}
 resource "ibm_is_volume" "compute_data_vol_02" {
-  name    = "${var.ibm_resource_prefix}-cmp-2"
-  profile = "general-purpose"
-  zone    = data.ibm_is_subnet.zone_3_subnet.zone
+  name     = "${var.ibm_resource_prefix}-cmp-2"
+  profile  = "custom"
+  zone     = data.ibm_is_subnet.zone_2_subnet.zone
+  iops     = 3000
+  capacity = 200
 }
 resource "ibm_is_instance" "compute_server_02_instance" {
   name           = "${var.ibm_resource_prefix}-cmp-2"
@@ -155,6 +162,9 @@ resource "ibm_is_instance" "compute_server_02_instance" {
     create = "60m"
     delete = "120m"
   }
+  depends_on = [
+    ibm_is_instance.control_server_02_instance
+  ]
 }
 #resource "ibm_is_floating_ip" "compute_server_02_floating_ip" {
 #  name           = "${var.ibm_resource_prefix}-cmp-2-fip"
@@ -187,9 +197,11 @@ resource "ibm_is_instance" "control_server_03_instance" {
 #  target         = ibm_is_instance.control_server_03_instance.primary_network_interface[0].id
 #}
 resource "ibm_is_volume" "compute_data_vol_03" {
-  name    = "${var.ibm_resource_prefix}-cmp-3"
-  profile = "general-purpose"
-  zone    = data.ibm_is_subnet.zone_3_subnet.zone
+  name     = "${var.ibm_resource_prefix}-cmp-3"
+  profile  = "custom"
+  zone     = data.ibm_is_subnet.zone_3_subnet.zone
+  iops     = 3000
+  capacity = 200
 }
 resource "ibm_is_instance" "compute_server_03_instance" {
   name           = "${var.ibm_resource_prefix}-cmp-3"
@@ -211,6 +223,9 @@ resource "ibm_is_instance" "compute_server_03_instance" {
     create = "60m"
     delete = "120m"
   }
+  depends_on = [
+    ibm_is_instance.control_server_03_instance
+  ]
 }
 #resource "ibm_is_floating_ip" "compute_server_03_floating_ip" {
 #  name           = "${var.ibm_resource_prefix}-cmp-3-fip"
