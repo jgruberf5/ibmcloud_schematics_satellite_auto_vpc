@@ -75,14 +75,14 @@ resource "ibm_is_instance" "control_server_01_instance" {
 #  target         = ibm_is_instance.control_server_01_instance.primary_network_interface[0].id
 #}
 resource "ibm_is_volume" "compute_data_vol_host_01_vol_01" {
-  name     = "${var.ibm_resource_prefix}-cmp-1"
+  name     = "${var.ibm_resource_prefix}-cmp-h1-v1"
   profile  = "custom"
   zone     = data.ibm_is_subnet.zone_1_subnet.zone
   iops     = 3000
   capacity = 200
 }
 resource "ibm_is_volume" "compute_data_vol_host_01_vol_02" {
-  name     = "${var.ibm_resource_prefix}-cmp-1"
+  name     = "${var.ibm_resource_prefix}-cmp-h1-v2"
   profile  = "custom"
   zone     = data.ibm_is_subnet.zone_1_subnet.zone
   iops     = 3000
@@ -143,14 +143,14 @@ resource "ibm_is_instance" "control_server_02_instance" {
 #  target         = ibm_is_instance.control_server_02_instance.primary_network_interface[0].id
 #}
 resource "ibm_is_volume" "compute_data_vol_host_02_vol_01" {
-  name     = "${var.ibm_resource_prefix}-cmp-2"
+  name     = "${var.ibm_resource_prefix}-cmp-h2-v1"
   profile  = "custom"
   zone     = data.ibm_is_subnet.zone_2_subnet.zone
   iops     = 3000
   capacity = 200
 }
 resource "ibm_is_volume" "compute_data_vol_host_02_vol_02" {
-  name     = "${var.ibm_resource_prefix}-cmp-2"
+  name     = "${var.ibm_resource_prefix}-cmp-h2-v2"
   profile  = "custom"
   zone     = data.ibm_is_subnet.zone_2_subnet.zone
   iops     = 3000
@@ -211,14 +211,14 @@ resource "ibm_is_instance" "control_server_03_instance" {
 #  target         = ibm_is_instance.control_server_03_instance.primary_network_interface[0].id
 #}
 resource "ibm_is_volume" "compute_data_vol_host_03_vol_01" {
-  name     = "${var.ibm_resource_prefix}-cmp-3"
+  name     = "${var.ibm_resource_prefix}-cmp-h3-v1"
   profile  = "custom"
   zone     = data.ibm_is_subnet.zone_3_subnet.zone
   iops     = 3000
   capacity = 200
 }
 resource "ibm_is_volume" "compute_data_vol_host_03_vol_02" {
-  name     = "${var.ibm_resource_prefix}-cmp-3"
+  name     = "${var.ibm_resource_prefix}-cmp-h3-v2"
   profile  = "custom"
   zone     = data.ibm_is_subnet.zone_3_subnet.zone
   iops     = 3000
