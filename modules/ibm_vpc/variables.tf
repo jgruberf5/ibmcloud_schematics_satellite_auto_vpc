@@ -32,12 +32,12 @@ variable "ibm_vpc_index" {
 }
 
 ##################################################################################
-# ibm_vpc_zone_1_prefix - The IPv4 VPC cidr to use as network prefix in zone 1
+# ibm_vpc_prefix - The IPv4 VPC cidr to use as network prefix
 ##################################################################################
-#variable "ibm_vpc_zone_1_prefix" {
-#  default     = ""
-#  description = "The IPv4 VPC cidr to use as network prefix in zone 1"
-#}
+variable "ibm_vpc_prefix" {
+  default     = ""
+  description = "The IPv4 VPC cidr to use as network prefix in zone 1"
+}
 
 ##################################################################################
 # ibm_vpc_zone_2_prefix - The IPv4 VPC cidr to use as network prefix in zone 2

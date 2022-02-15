@@ -1,8 +1,4 @@
 # lookup compute profile by name
-data "ibm_is_instance_profile" "control_profile" {
-  name = var.ibm_control_profile
-}
-
 data "ibm_is_instance_profile" "compute_profile" {
   name = var.ibm_compute_profile
 }
@@ -50,30 +46,6 @@ locals {
 
 
 # zone 1 servers
-resource "ibm_is_instance" "control_server_01_instance" {
-  name           = "${var.ibm_resource_prefix}-ctl-1"
-  resource_group = data.ibm_resource_group.group.id
-  image          = data.ibm_is_image.rhel79.id
-  profile        = data.ibm_is_instance_profile.control_profile.id
-  primary_network_interface {
-    name            = "internal"
-    subnet          = data.ibm_is_subnet.zone_1_subnet.id
-    security_groups = [local.security_group_id]
-  }
-  vpc       = data.ibm_is_subnet.zone_1_subnet.vpc
-  zone      = data.ibm_is_subnet.zone_1_subnet.zone
-  keys      = [data.ibm_is_ssh_key.ssh_key.id]
-  user_data = data.template_file.rhel_server.rendered
-  timeouts {
-    create = "60m"
-    delete = "120m"
-  }
-}
-#resource "ibm_is_floating_ip" "control_server_01_floating_ip" {
-#  name           = "${var.ibm_resource_prefix}-ctl-1-fip"
-#  resource_group = data.ibm_resource_group.group.id
-#  target         = ibm_is_instance.control_server_01_instance.primary_network_interface[0].id
-#}
 resource "ibm_is_volume" "compute_data_vol_host_01_vol_01" {
   name     = "${var.ibm_resource_prefix}-cmp-h1-v1"
   profile  = "custom"
@@ -108,40 +80,8 @@ resource "ibm_is_instance" "compute_server_01_instance" {
     create = "60m"
     delete = "120m"
   }
-  depends_on = [
-    ibm_is_instance.control_server_01_instance
-  ]
 }
-#resource "ibm_is_floating_ip" "compute_server_01_floating_ip" {
-#  name           = "${var.ibm_resource_prefix}-cmp-1-fip"
-#  resource_group = data.ibm_resource_group.group.id
-#  target         = ibm_is_instance.compute_server_01_instance.primary_network_interface[0].id
-#}
 # zone 2 servers
-resource "ibm_is_instance" "control_server_02_instance" {
-  name           = "${var.ibm_resource_prefix}-ctl-2"
-  resource_group = data.ibm_resource_group.group.id
-  image          = data.ibm_is_image.rhel79.id
-  profile        = data.ibm_is_instance_profile.control_profile.id
-  primary_network_interface {
-    name            = "internal"
-    subnet          = data.ibm_is_subnet.zone_2_subnet.id
-    security_groups = [local.security_group_id]
-  }
-  vpc       = data.ibm_is_subnet.zone_2_subnet.vpc
-  zone      = data.ibm_is_subnet.zone_2_subnet.zone
-  keys      = [data.ibm_is_ssh_key.ssh_key.id]
-  user_data = data.template_file.rhel_server.rendered
-  timeouts {
-    create = "60m"
-    delete = "120m"
-  }
-}
-#resource "ibm_is_floating_ip" "control_server_02_floating_ip" {
-#  name           = "${var.ibm_resource_prefix}-ctl-2-fip"
-#  resource_group = data.ibm_resource_group.group.id
-#  target         = ibm_is_instance.control_server_02_instance.primary_network_interface[0].id
-#}
 resource "ibm_is_volume" "compute_data_vol_host_02_vol_01" {
   name     = "${var.ibm_resource_prefix}-cmp-h2-v1"
   profile  = "custom"
@@ -176,40 +116,8 @@ resource "ibm_is_instance" "compute_server_02_instance" {
     create = "60m"
     delete = "120m"
   }
-  depends_on = [
-    ibm_is_instance.control_server_02_instance
-  ]
 }
-#resource "ibm_is_floating_ip" "compute_server_02_floating_ip" {
-#  name           = "${var.ibm_resource_prefix}-cmp-2-fip"
-#  resource_group = data.ibm_resource_group.group.id
-#  target         = ibm_is_instance.compute_server_02_instance.primary_network_interface[0].id
-#}
 # zone 3 servers
-resource "ibm_is_instance" "control_server_03_instance" {
-  name           = "${var.ibm_resource_prefix}-ctl-3"
-  resource_group = data.ibm_resource_group.group.id
-  image          = data.ibm_is_image.rhel79.id
-  profile        = data.ibm_is_instance_profile.control_profile.id
-  primary_network_interface {
-    name            = "internal"
-    subnet          = data.ibm_is_subnet.zone_3_subnet.id
-    security_groups = [local.security_group_id]
-  }
-  vpc       = data.ibm_is_subnet.zone_3_subnet.vpc
-  zone      = data.ibm_is_subnet.zone_3_subnet.zone
-  keys      = [data.ibm_is_ssh_key.ssh_key.id]
-  user_data = data.template_file.rhel_server.rendered
-  timeouts {
-    create = "60m"
-    delete = "120m"
-  }
-}
-#resource "ibm_is_floating_ip" "control_server_03_floating_ip" {
-#  name           = "${var.ibm_resource_prefix}-ctl-3-fip"
-#  resource_group = data.ibm_resource_group.group.id
-#  target         = ibm_is_instance.control_server_03_instance.primary_network_interface[0].id
-#}
 resource "ibm_is_volume" "compute_data_vol_host_03_vol_01" {
   name     = "${var.ibm_resource_prefix}-cmp-h3-v1"
   profile  = "custom"
@@ -244,12 +152,21 @@ resource "ibm_is_instance" "compute_server_03_instance" {
     create = "60m"
     delete = "120m"
   }
+}
+
+# Sleep long enough for the hosts to attach to Satellite
+resource "time_sleep" "wait_for_control_host_attach" {
   depends_on = [
-    ibm_is_instance.control_server_03_instance
+    ibm_is_instance.compute_server_01_instance,
+    ibm_is_instance.compute_server_02_instance,
+    ibm_is_instance.compute_server_03_instance
+  ]
+  create_duration = var.ibm_satellite_attach_delay
+}
+
+data "ibm_satellite_location" "location" {
+  location = var.ibm_satellite_location_id
+  depends_on = [
+    time_sleep.wait_for_control_host_attach
   ]
 }
-#resource "ibm_is_floating_ip" "compute_server_03_floating_ip" {
-#  name           = "${var.ibm_resource_prefix}-cmp-3-fip"
-#  resource_group = data.ibm_resource_group.group.id
-#  target         = ibm_is_instance.compute_server_03_instance.primary_network_interface[0].id
-#}

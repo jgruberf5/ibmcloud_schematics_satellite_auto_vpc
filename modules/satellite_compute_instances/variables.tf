@@ -25,15 +25,6 @@ variable "ibm_resource_prefix" {
 }
 
 ##################################################################################
-# ibm_control_profile - The name of the VPC profile to use for the control instances
-##################################################################################
-variable "ibm_control_profile" {
-  type        = string
-  default     = "bx2-4x16"
-  description = "The name of the VPC profile to use for the control instances"
-}
-
-##################################################################################
 # ibm_compute_profile - The name of the VPC profile to use for the compute instances
 ##################################################################################
 variable "ibm_compute_profile" {
@@ -88,4 +79,20 @@ variable "ibm_security_group_id" {
 variable "ibm_attach_script" {
   default     = ""
   description = "The managed server attach script content"
+}
+
+##################################################################################
+# ibm_satellite_location_id - The Satellite location id
+##################################################################################
+variable "ibm_satellite_location_id" {
+  default     = ""
+  description = "The Satellite location id"
+}
+
+##################################################################################
+# ibm_satellite_attach_delay - How long in minutes to wait for host attach
+##################################################################################
+variable "ibm_satellite_attach_delay" {
+  default     = "10m"
+  description = "How long in minutes to wait for host attach"
 }

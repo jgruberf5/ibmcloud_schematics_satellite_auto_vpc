@@ -1,29 +1,40 @@
+locals {
+  prefix_management = var.ibm_vpc_prefix == "" ? "auto" : "manual"
+  prefix_create     = var.ibm_vpc_prefix == "" ? 0 : 1
+  zone_prefix_1     = var.ibm_vpc_prefix == "" ? "" : cidrsubnet(var.ibm_vpc_prefix, (23 - (split("/", var.ibm_vpc_prefix)[1])), 0)
+  zone_prefix_2     = var.ibm_vpc_prefix == "" ? "" : cidrsubnet(var.ibm_vpc_prefix, (23 - (split("/", var.ibm_vpc_prefix)[1])), 1)
+  zone_prefix_3     = var.ibm_vpc_prefix == "" ? "" : cidrsubnet(var.ibm_vpc_prefix, (23 - (split("/", var.ibm_vpc_prefix)[1])), 2)
+}
+
 resource "ibm_is_vpc" "vpc" {
   name                      = "${var.ibm_vpc_name}-${var.ibm_region}-${var.ibm_vpc_index}"
   resource_group            = data.ibm_resource_group.group.id
-  address_prefix_management = "auto"
+  address_prefix_management = local.prefix_management
 }
 
-#resource "ibm_is_vpc_address_prefix" "zone_1_vpc_address_prefix" {
-#  name = "${var.ibm_vpc_name}-${var.ibm_region}-1-${var.ibm_vpc_index}-ap"
-#  zone = "${var.ibm_region}-1"
-#  vpc  = ibm_is_vpc.vpc.id
-#  cidr = var.ibm_vpc_zone_1_prefix
-#}
+resource "ibm_is_vpc_address_prefix" "zone_1_vpc_address_prefix" {
+  count = local.prefix_create
+  name  = "${var.ibm_vpc_name}-${var.ibm_region}-1-${var.ibm_vpc_index}-ap"
+  zone  = "${var.ibm_region}-1"
+  vpc   = ibm_is_vpc.vpc.id
+  cidr  = local.zone_prefix_1
+}
 
-#resource "ibm_is_vpc_address_prefix" "zone_2_vpc_address_prefix" {
-#  name = "${var.ibm_vpc_name}-${var.ibm_region}-2-${var.ibm_vpc_index}-ap"
-#  zone = "${var.ibm_region}-2"
-#  vpc  = ibm_is_vpc.vpc.id
-#  cidr = var.ibm_vpc_zone_2_prefix
-#}
+resource "ibm_is_vpc_address_prefix" "zone_2_vpc_address_prefix" {
+  count = local.prefix_create
+  name  = "${var.ibm_vpc_name}-${var.ibm_region}-2-${var.ibm_vpc_index}-ap"
+  zone  = "${var.ibm_region}-2"
+  vpc   = ibm_is_vpc.vpc.id
+  cidr  = local.zone_prefix_2
+}
 
-#resource "ibm_is_vpc_address_prefix" "zone_3_vpc_address_prefix" {
-#  name = "${var.ibm_vpc_name}-${var.ibm_region}-3-${var.ibm_vpc_index}-ap"
-#  zone = "${var.ibm_region}-3"
-#  vpc  = ibm_is_vpc.vpc.id
-#  cidr = var.ibm_vpc_zone_3_prefix
-#}
+resource "ibm_is_vpc_address_prefix" "zone_3_vpc_address_prefix" {
+  count = local.prefix_create
+  name  = "${var.ibm_vpc_name}-${var.ibm_region}-3-${var.ibm_vpc_index}-ap"
+  zone  = "${var.ibm_region}-3"
+  vpc   = ibm_is_vpc.vpc.id
+  cidr  = local.zone_prefix_3
+}
 
 // allow all inbound
 resource "ibm_is_security_group_rule" "allow_inbound" {
@@ -43,6 +54,11 @@ resource "ibm_is_security_group_rule" "allow_outbound" {
 
 data "ibm_is_vpc_address_prefixes" "vpc_prefixes" {
   vpc = ibm_is_vpc.vpc.id
+  depends_on = [
+    ibm_is_vpc_address_prefix.zone_1_vpc_address_prefix,
+    ibm_is_vpc_address_prefix.zone_2_vpc_address_prefix,
+    ibm_is_vpc_address_prefix.zone_3_vpc_address_prefix
+  ]
 }
 
 locals {

@@ -24,28 +24,20 @@ variable "ibm_vpc_index" {
 }
 
 ##################################################################################
-# ibm_vpc_zone_1_prefix - The IPv4 VPC cidr to use as network prefix in zone 1
+# ibm_vpc_prefix - The IPv4 VPC cidr to use as network prefix for your VPC
 ##################################################################################
-#variable "ibm_vpc_zone_1_prefix" {
-#  default     = ""
-#  description = "The IPv4 VPC cidr to use as network prefix in zone 1"
-#}
+variable "ibm_vpc_prefix" {
+  default     = ""
+  description = "The IPv4 VPC cidr to use as network prefix in zone 1"
+}
 
 ##################################################################################
-# ibm_vpc_zone_2_prefix - The IPv4 VPC cidr to use as network prefix in zone 2
+# ibm_satellite_attach_delay - How long in minutes to wait for host attach
 ##################################################################################
-#variable "ibm_vpc_zone_2_prefix" {
-#  default     = ""
-#  description = "The IPv4 VPC cidr to use as network prefix in zone 2"
-#}
-
-##################################################################################
-# ibm_vpc_zone_3_prefix - The IPv4 VPC cidr to use as network prefix in zone 3
-##################################################################################
-#variable "ibm_vpc_zone_3_prefix" {
-#  default     = ""
-#  description = "The IPv4 VPC cidr to use as network prefix in zone 3"
-#}
+variable "ibm_satellite_attach_delay" {
+  default     = "10m"
+  description = "How long in minutes to wait for host attach"
+}
 
 ##################################################################################
 # ibm_satellite_location_managed_from - The IKS metro to manage this location
