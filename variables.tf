@@ -92,6 +92,15 @@ variable "ibm_vpn_profile" {
 }
 
 ##################################################################################
+# ibm_nfs_profile - The name of the VPC profile to use for the nfs server
+##################################################################################
+variable "ibm_nfs_profile" {
+  type        = string
+  default     = "bx2-4x16"
+  description = "The name of the VPC profile to use for the control instances"
+}
+
+##################################################################################
 # ibm_security_group_id - The VPC security group ID
 ##################################################################################
 variable "ibm_security_group_id" {

@@ -22,6 +22,17 @@ module "wireguard_gateway" {
   vpn_internal_networks = "${module.ibm_vpc.vpc_zone_1_subnet_cidr}, ${module.ibm_vpc.vpc_zone_2_subnet_cidr}, ${module.ibm_vpc.vpc_zone_3_subnet_cidr}"
 }
 
+module "nfs_server" {
+  source = "./modules/openshift_nfs_instance"
+  ibm_resource_group    = var.ibm_resource_group
+  ibm_region            = var.ibm_region
+  ibm_ssh_key_name      = var.ibm_ssh_key_name
+  ibm_resource_prefix   = var.ibm_resource_prefix
+  ibm_nfs_profile       = var.ibm_nfs_profile
+  ibm_subnet_id         = module.ibm_vpc.vpc_zone_1_subnet_id
+  ibm_security_group_id = module.ibm_vpc.vpc_default_security_group_id
+}
+
 module "satellite_location" {
   source                    = "./modules/satellite_location"
   ibm_resource_group        = var.ibm_resource_group

@@ -42,3 +42,9 @@ output "vpn_client_configurations" {
   value       = module.wireguard_gateway.client_configurations
   description = "SSH copy location for the VPN gateway client configurations"
 }
+
+
+output "nfs_server" {
+  value       = module.nfs_server.nfs_address
+  description = "The NFS server address to used for an OpenShift storage provider"
+}

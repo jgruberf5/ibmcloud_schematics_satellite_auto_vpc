@@ -1,0 +1,31 @@
+#cloud-config
+disk_setup:
+    /dev/vdd:
+        table_type: gpt
+        layout: true
+        overwrite: true
+
+fs_setup:
+    - label: data
+      filesystem: ext4
+      device: /dev/vdd1
+      cmd: mkfs -t %(filesystem)s -L %(label)s %(device)s
+
+mounts:
+    - ["/dev/vdd1", "/opt/data", "ext4", "defaults", "0", "0"]
+
+write_files:
+    - owner: root:root
+      path: /root/make_exports.sh
+      permissions: "0755"
+      content: |
+          #!/usr/bin/bash
+          # putting this in a script to force ordering of commands
+          apt -y update
+          apt -y install nfs-kernel-server
+          echo '/opt/data  *(rw,sync,no_subtree_check,no_root_squash,no_all_squash,insecure)' >> /etc/exports
+          systemctl restart nfs-kernel-server
+          apt -y upgrade
+          reboot
+runcmd:
+    - [ /root/make_exports.sh ]

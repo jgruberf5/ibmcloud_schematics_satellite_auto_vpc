@@ -46,20 +46,6 @@ locals {
 
 
 # zone 1 servers
-resource "ibm_is_volume" "compute_data_vol_host_01_vol_01" {
-  name     = "${var.ibm_resource_prefix}-cmp-h1-v1"
-  profile  = "custom"
-  zone     = data.ibm_is_subnet.zone_1_subnet.zone
-  iops     = 3000
-  capacity = 200
-}
-resource "ibm_is_volume" "compute_data_vol_host_01_vol_02" {
-  name     = "${var.ibm_resource_prefix}-cmp-h1-v2"
-  profile  = "custom"
-  zone     = data.ibm_is_subnet.zone_1_subnet.zone
-  iops     = 3000
-  capacity = 200
-}
 resource "ibm_is_instance" "compute_server_01_instance" {
   name           = "${var.ibm_resource_prefix}-cmp-1"
   resource_group = data.ibm_resource_group.group.id
@@ -74,7 +60,6 @@ resource "ibm_is_instance" "compute_server_01_instance" {
   zone               = data.ibm_is_subnet.zone_1_subnet.zone
   keys               = [data.ibm_is_ssh_key.ssh_key.id]
   auto_delete_volume = true
-  volumes            = [ibm_is_volume.compute_data_vol_host_01_vol_01.id, ibm_is_volume.compute_data_vol_host_01_vol_02.id]
   user_data          = data.template_file.rhel_server.rendered
   timeouts {
     create = "60m"
@@ -82,20 +67,6 @@ resource "ibm_is_instance" "compute_server_01_instance" {
   }
 }
 # zone 2 servers
-resource "ibm_is_volume" "compute_data_vol_host_02_vol_01" {
-  name     = "${var.ibm_resource_prefix}-cmp-h2-v1"
-  profile  = "custom"
-  zone     = data.ibm_is_subnet.zone_2_subnet.zone
-  iops     = 3000
-  capacity = 200
-}
-resource "ibm_is_volume" "compute_data_vol_host_02_vol_02" {
-  name     = "${var.ibm_resource_prefix}-cmp-h2-v2"
-  profile  = "custom"
-  zone     = data.ibm_is_subnet.zone_2_subnet.zone
-  iops     = 3000
-  capacity = 200
-}
 resource "ibm_is_instance" "compute_server_02_instance" {
   name           = "${var.ibm_resource_prefix}-cmp-2"
   resource_group = data.ibm_resource_group.group.id
@@ -110,7 +81,6 @@ resource "ibm_is_instance" "compute_server_02_instance" {
   zone               = data.ibm_is_subnet.zone_2_subnet.zone
   keys               = [data.ibm_is_ssh_key.ssh_key.id]
   auto_delete_volume = true
-  volumes            = [ibm_is_volume.compute_data_vol_host_02_vol_01.id, ibm_is_volume.compute_data_vol_host_02_vol_02.id]
   user_data          = data.template_file.rhel_server.rendered
   timeouts {
     create = "60m"
@@ -118,20 +88,6 @@ resource "ibm_is_instance" "compute_server_02_instance" {
   }
 }
 # zone 3 servers
-resource "ibm_is_volume" "compute_data_vol_host_03_vol_01" {
-  name     = "${var.ibm_resource_prefix}-cmp-h3-v1"
-  profile  = "custom"
-  zone     = data.ibm_is_subnet.zone_3_subnet.zone
-  iops     = 3000
-  capacity = 200
-}
-resource "ibm_is_volume" "compute_data_vol_host_03_vol_02" {
-  name     = "${var.ibm_resource_prefix}-cmp-h3-v2"
-  profile  = "custom"
-  zone     = data.ibm_is_subnet.zone_3_subnet.zone
-  iops     = 3000
-  capacity = 200
-}
 resource "ibm_is_instance" "compute_server_03_instance" {
   name           = "${var.ibm_resource_prefix}-cmp-3"
   resource_group = data.ibm_resource_group.group.id
@@ -146,7 +102,6 @@ resource "ibm_is_instance" "compute_server_03_instance" {
   zone               = data.ibm_is_subnet.zone_3_subnet.zone
   keys               = [data.ibm_is_ssh_key.ssh_key.id]
   auto_delete_volume = true
-  volumes            = [ibm_is_volume.compute_data_vol_host_03_vol_01.id, ibm_is_volume.compute_data_vol_host_03_vol_02.id]
   user_data          = data.template_file.rhel_server.rendered
   timeouts {
     create = "60m"
