@@ -1,0 +1,14 @@
+apiVersion: operator.openshift.io/v1
+kind: IngressController
+metadata:
+  name: default
+  namespace: openshift-ingress-operator
+spec:
+  defaultCertificate:
+    name: f5dc-wdc-3-sat-cluster-1-725043ecde5c2abd5348b37c670b477b-0000
+  endpointPublishingStrategy:
+    type: Private
+  nodePlacement:
+    tolerations:
+    - key: dedicated
+      value: edge
