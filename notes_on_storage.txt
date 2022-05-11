@@ -1,0 +1,18 @@
+NFS Server:
+NFS mount: /data
+
+on each cmp host:
+
+yum install nfs-utils
+mkdir /mnt/data
+mount -t nfs 10.112.4.8:/data /mnt/data
+hostname=`cat /etc/hostname`
+echo $hostname > "/mnt/data/$hostname"
+
+oc adm policy add-scc-to-user hostmount-anyuid system:serviceaccount:default:nfs-client-provisioner
+
+yum install nfs-utils
+mkdir /mnt/data
+mount -t nfs 10.111.0.8:/data /mnt/data
+hostname=`cat /etc/hostname`
+echo $hostname > "/mnt/data/$hostname"
