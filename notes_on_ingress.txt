@@ -1,0 +1,20 @@
+oc get ingresscontroller default -n openshift-ingress-operator -o yaml > original_ingress.yaml
+
+With your preferred editor, open the file and remove the following blocks:
+
+annotations
+creationTimestamp
+managedFields
+status
+finalizers
+generation
+resourceVersion
+selfLink
+uid
+
+
+oc scale --replicas=0 deployment/ingress-operator -n openshift-ingress-operator
+oc patch ingresscontroller default -n openshift-ingress-operator -p '{"metadata":{"finalizers":null}}' --type=merge
+oc delete ingresscontroller default -n openshift-ingress-operator
+oc apply -f ingress.yaml
+oc scale --replicas=1 deployment/ingress-operator -n openshift-ingress-operator
